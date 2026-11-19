@@ -164,8 +164,7 @@ class SalesServiceApplicationTests {
     void getProductSalesRanking_shouldRejectNullDates() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> salesService.getProductSalesRanking(
-                        null,
+                () -> salesService.getProductSalesRanking(\n                        TENANT_ID,\n                        null,
                         LocalDate.of(2026, 1, 31),
                         "Electronics"
                 )
@@ -265,7 +264,7 @@ class SalesServiceApplicationTests {
     @Test
     void getSalesByCategory_shouldReturnSalesForWeekPeriod() {
 
-        when(saleRepository.findSalesByCategory(any(LocalDate.class)))
+        when(saleRepository.findSalesByCategory(TENANT_ID, any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", new BigDecimal("1000.00")},
                         new Object[]{"Books", new BigDecimal("500.00")}
@@ -302,7 +301,7 @@ class SalesServiceApplicationTests {
                         new BigDecimal("2000.00")
                 }
         );
-        when(saleRepository.findSalesByCategory(any(LocalDate.class)))
+        when(saleRepository.findSalesByCategory(TENANT_ID, any(LocalDate.class)))
                 .thenReturn(rows);
 
         List<CategorySalesResponse> result =
@@ -325,7 +324,7 @@ class SalesServiceApplicationTests {
     void getSalesByCategory_shouldReturnSalesForYearPeriod() {
         List<Object[]> rows = Collections.singletonList(new Object[]{"Electronics",
                 new BigDecimal("50000.00")});
-        when(saleRepository.findSalesByCategory(any(LocalDate.class)))
+        when(saleRepository.findSalesByCategory(TENANT_ID, any(LocalDate.class)))
                 .thenReturn(rows);
 
         List<CategorySalesResponse> result =
