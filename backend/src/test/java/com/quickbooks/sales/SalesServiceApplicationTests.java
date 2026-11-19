@@ -35,7 +35,7 @@ class SalesServiceApplicationTests {
         LocalDate endDate = LocalDate.of(2026, 1, 31);
 
         when(saleRepository.findSalesByCategoryAndDateBetween(
-                startDate, endDate))
+                TENANT_ID, startDate, endDate))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", LocalDate.of(2026, 1, 5),
                                 new BigDecimal("100.00")},
@@ -105,7 +105,7 @@ class SalesServiceApplicationTests {
         );
 
         when(saleRepository.findProductSalesRanking(
-                startDate,
+                TENANT_ID, startDate,
                 endDate.plusDays(1),
                 "Electronics"
         )).thenReturn(rows);
@@ -232,6 +232,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getDailySalesByCategory(
+                        TENANT_ID,
                         " ",
                         startDate,
                         endDate
@@ -304,7 +305,7 @@ class SalesServiceApplicationTests {
 
         List<CategorySalesResponse> result =
                 salesService.getSalesByCategory(
-                        com.quickbooks.sales.model.Period.MONTH);
+                        TENANT_ID, com.quickbooks.sales.model.Period.MONTH);
 
         assertEquals(1, result.size());
         assertEquals("Electronics", result.get(0).category());
@@ -326,7 +327,7 @@ class SalesServiceApplicationTests {
 
         List<CategorySalesResponse> result =
                 salesService.getSalesByCategory(
-                        com.quickbooks.sales.model.Period.YEAR);
+                        TENANT_ID, com.quickbooks.sales.model.Period.YEAR);
 
         assertEquals(1, result.size());
         assertEquals("Electronics", result.get(0).category());
@@ -480,6 +481,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getDailySalesByCategory(
+                        TENANT_ID,
                         "Electronics",
                         startDate,
                         endDate)
