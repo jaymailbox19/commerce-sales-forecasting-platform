@@ -80,7 +80,7 @@ class SalesServiceApplicationTests {
 
     @Test
     void getSalesByCategory_shouldReturnPeriodSales() {
-        when(saleRepository.findSalesByCategory(TENANT_ID, any(LocalDate.class)))
+        when(saleRepository.findSalesByCategory(eq(TENANT_ID), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", new BigDecimal("1000.00")},
                         new Object[]{"Books", new BigDecimal("500.00")}
