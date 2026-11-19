@@ -36,7 +36,7 @@ class PredictionServiceTest {
 
     @Test
     void forecastCategory_shouldRejectCategoryWithNoSales() {
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(Collections.emptyList());
 
         IllegalArgumentException exception = assertThrows(
@@ -60,7 +60,7 @@ class PredictionServiceTest {
     void forecastCategory_shouldRejectFewerThanFiveWeeksOfHistory() {
         LocalDate monday = LocalDate.of(2026, 8, 3);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{
                                 "Electronics",
@@ -105,7 +105,7 @@ class PredictionServiceTest {
     void forecastCategory_shouldReturnPredictionAndHistoricalActuals() {
         LocalDate firstWeek = LocalDate.of(2026, 6, 1);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", firstWeek, new BigDecimal("9000")},
                         new Object[]{"Electronics", firstWeek.plusWeeks(1), new BigDecimal("11000")},
@@ -151,7 +151,7 @@ class PredictionServiceTest {
     void getDailySales_shouldMapRepositoryRows() {
         LocalDate date = LocalDate.of(2026, 8, 3);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", date, new BigDecimal("1000.00")},
                         new Object[]{"Furniture", date.plusDays(1), new BigDecimal("2000.00")}
@@ -172,7 +172,7 @@ class PredictionServiceTest {
     void getWeeklySalesForPeriod_shouldGroupSalesByMonday() {
         LocalDate monday = LocalDate.of(2026, 8, 3);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", monday, new BigDecimal("1000")},
                         new Object[]{"Electronics", monday.plusDays(1), new BigDecimal("2000")},
@@ -218,7 +218,7 @@ class PredictionServiceTest {
     void predictTopCategories_shouldReturnCategoriesSortedByPrediction() {
         LocalDate monday = LocalDate.of(2026, 8, 3);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", monday, new BigDecimal("1000")},
                         new Object[]{"Electronics", monday.plusWeeks(1), new BigDecimal("2000")},
@@ -245,7 +245,7 @@ class PredictionServiceTest {
     void runBacktest_shouldCalculatePredictionsAndAbsoluteErrors() {
         LocalDate firstMonday = LocalDate.of(2026, 8, 3);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         // Aug 3
                         new Object[]{"Electronics", firstMonday, new BigDecimal("1000")},
@@ -314,12 +314,12 @@ class PredictionServiceTest {
             });
         }
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(rows);
 
         // The XGBoost backtest makes an additional repository call
         // using findSalesByCategoryAndDateBetween().
-        when(saleRepository.findSalesByCategoryAndDateBetween(eq(1L), any(), any()))
+        when(saleRepository.findSalesByCategoryAndDateBetween(eq(1L), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(rows);
 
         CategoryPredictionResponse mlResponse =
@@ -347,7 +347,7 @@ class PredictionServiceTest {
     void compareBacktests_shouldCombineMatchingResults() {
         LocalDate predictionWeek = LocalDate.of(2026, 9, 7);
 
-        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any()))
+        when(saleRepository.findSalesByCategoryAndDate(eq(1L), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", LocalDate.of(2026, 8, 10), new BigDecimal("1000")},
                         new Object[]{"Electronics", LocalDate.of(2026, 8, 17), new BigDecimal("2000")},
@@ -357,7 +357,7 @@ class PredictionServiceTest {
                         new Object[]{"Electronics", predictionWeek.plusWeeks(1), new BigDecimal("6000")}
                 ));
 
-        when(saleRepository.findSalesByCategoryAndDateBetween(eq(1L), any(), any()))
+        when(saleRepository.findSalesByCategoryAndDateBetween(eq(1L), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(
                         new Object[]{"Electronics", LocalDate.of(2023, 9, 4), new BigDecimal("1000")},
                         new Object[]{"Electronics", LocalDate.of(2023, 9, 11), new BigDecimal("1200")},
