@@ -59,8 +59,7 @@ class SalesServiceApplicationTests {
         assertEquals(new BigDecimal("50.00"),
                 result.get(1).totalSales());
 
-        verify(saleRepository).findSalesByCategoryAndDateBetween(
-                startDate, endDate);
+        verify(saleRepository).findSalesByCategoryAndDateBetween(TENANT_ID, startDate, endDate);
     }
 
     @Test
@@ -131,8 +130,7 @@ class SalesServiceApplicationTests {
         assertEquals("Monitor", result.get(1).productName());
         assertEquals(2L, result.get(1).rank());
 
-        verify(saleRepository).findProductSalesRanking(
-                startDate,
+        verify(saleRepository).findProductSalesRanking(TENANT_ID, startDate,
                 endDate.plusDays(1),
                 "Electronics"
         );
@@ -222,8 +220,7 @@ class SalesServiceApplicationTests {
         assertEquals(LocalDate.of(2026, 1, 3), result.get(1).date());
         assertEquals(new BigDecimal("1800.00"), result.get(1).amount());
 
-        verify(saleRepository).findSalesByCategoryAndDateBetween(
-                startDate, endDate
+        verify(saleRepository).findSalesByCategoryAndDateBetween(TENANT_ID, startDate, endDate
         );
     }
 
@@ -290,8 +287,7 @@ class SalesServiceApplicationTests {
                 result.get(1).totalSales()
         );
 
-        verify(saleRepository).findSalesByCategory(
-                any(LocalDate.class)
+        verify(saleRepository).findSalesByCategory(TENANT_ID, any(LocalDate.class)
         );
     }
 
@@ -317,8 +313,7 @@ class SalesServiceApplicationTests {
                 result.get(0).totalSales()
         );
 
-        verify(saleRepository).findSalesByCategory(
-                any(LocalDate.class)
+        verify(saleRepository).findSalesByCategory(TENANT_ID, any(LocalDate.class)
         );
     }
 
@@ -340,8 +335,7 @@ class SalesServiceApplicationTests {
                 result.get(0).totalSales()
         );
 
-        verify(saleRepository).findSalesByCategory(
-                any(LocalDate.class)
+        verify(saleRepository).findSalesByCategory(TENANT_ID, any(LocalDate.class)
         );
     }
 
@@ -377,8 +371,7 @@ class SalesServiceApplicationTests {
                 result.get(0).totalSales()
         );
 
-        verify(saleRepository).findSalesByCategoryAndDateBetween(
-                startDate, endDate);
+        verify(saleRepository).findSalesByCategoryAndDateBetween(TENANT_ID, startDate, endDate);
     }
 
     @Test
