@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 
 
 class SalesServiceApplicationTests {
+    private static final Long TENANT_ID = 1L;
     private final SaleRepository saleRepository =
             mock(SaleRepository.class);
 
@@ -47,7 +48,7 @@ class SalesServiceApplicationTests {
 
         List<CategorySalesResponse> result =
                 salesService.getSalesByCategory(
-                        startDate, endDate, null);
+                        TENANT_ID, startDate, endDate, null);
 
         assertEquals(2, result.size());
 
@@ -112,6 +113,7 @@ class SalesServiceApplicationTests {
 
         List<ProductSalesRanking> result =
                 salesService.getProductSalesRanking(
+                        TENANT_ID,
                         startDate,
                         endDate,
                         "Electronics"
@@ -144,6 +146,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getProductSalesRanking(
+                        TENANT_ID,
                         startDate,
                         endDate,
                         "Electronics"
@@ -202,7 +205,7 @@ class SalesServiceApplicationTests {
         );
 
         when(saleRepository.findSalesByCategoryAndDateBetween(
-                startDate, endDate
+                TENANT_ID, startDate, endDate
         )).thenReturn(rows);
 
         List<DailyCategorySalesResponse> result =
@@ -248,6 +251,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getDailySalesByCategory(
+                        TENANT_ID,
                         "Electronics",
                         null,
                         LocalDate.of(2026, 1, 31)
@@ -347,7 +351,7 @@ class SalesServiceApplicationTests {
         LocalDate endDate = LocalDate.of(2026, 1, 31);
 
         when(saleRepository.findSalesByCategoryAndDateBetween(
-                startDate, endDate))
+                TENANT_ID, startDate, endDate))
                 .thenReturn(List.of(
                         new Object[]{
                                 "Electronics",
@@ -363,7 +367,7 @@ class SalesServiceApplicationTests {
 
         List<CategorySalesResponse> result =
                 salesService.getSalesByCategory(
-                        startDate, endDate);
+                        TENANT_ID, startDate, endDate);
 
         assertEquals(1, result.size());
         assertEquals("Electronics", result.get(0).category());
@@ -383,7 +387,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getSalesByCategory(
-                        null, endDate, null)
+                        TENANT_ID, null, endDate, null)
         );
 
         assertEquals(
@@ -402,7 +406,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getSalesByCategory(
-                        startDate, null, null)
+                        TENANT_ID, startDate, null, null)
         );
 
         assertEquals(
@@ -420,7 +424,7 @@ class SalesServiceApplicationTests {
         LocalDate endDate = LocalDate.of(2026, 1, 31);
 
         when(saleRepository.findSalesByCategoryAndDateBetween(
-                startDate, endDate))
+                TENANT_ID, startDate, endDate))
                 .thenReturn(List.of(
                         new Object[]{
                                 "Electronics",
@@ -452,7 +456,7 @@ class SalesServiceApplicationTests {
         LocalDate endDate = LocalDate.of(2026, 1, 31);
 
         when(saleRepository.findSalesByCategoryAndDateBetween(
-                startDate, endDate))
+                TENANT_ID, startDate, endDate))
                 .thenReturn(List.of(
                         new Object[]{
                                 "Electronics",
@@ -501,6 +505,7 @@ class SalesServiceApplicationTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> salesService.getDailySalesByCategory(
+                        TENANT_ID,
                         "Electronics",
                         LocalDate.of(2026, 1, 1),
                         null)
