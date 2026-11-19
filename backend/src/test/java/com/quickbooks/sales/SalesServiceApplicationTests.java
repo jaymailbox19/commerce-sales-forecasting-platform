@@ -164,7 +164,9 @@ class SalesServiceApplicationTests {
     void getProductSalesRanking_shouldRejectNullDates() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> salesService.getProductSalesRanking(\n                        TENANT_ID,\n                        null,
+                () -> salesService.getProductSalesRanking(
+                        TENANT_ID,
+                        null,
                         LocalDate.of(2026, 1, 31),
                         "Electronics"
                 )
