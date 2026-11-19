@@ -92,7 +92,7 @@ class SalesServiceApplicationTests {
         assertEquals(2, result.size());
         assertEquals("Electronics", result.get(0).category());
         assertEquals(new BigDecimal("1000.00"), result.get(0).totalSales());
-        verify(saleRepository).findSalesByCategory(TENANT_ID, any(LocalDate.class));
+        verify(saleRepository).findSalesByCategory(eq(TENANT_ID), any(LocalDate.class));
     }
 
     @Test
