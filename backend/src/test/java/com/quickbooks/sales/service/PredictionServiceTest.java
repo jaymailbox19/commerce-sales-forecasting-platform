@@ -414,10 +414,7 @@ class PredictionServiceTest {
         when(saleRepository.findSalesByCategoryAndDate(1L, startDate))
                 .thenReturn(dailySales);
 
-        when(saleRepository.findProductSalesRanking(
-                eq(1L),
-                any(),
-                any(),
+        when(saleRepository.findProductSalesRanking(\n                eq(1L),\n                any(LocalDate.class),\n                any(LocalDate.class),
                 eq("Electronics")))
                 .thenReturn(List.of(
                         new Object[]{
