@@ -3,67 +3,82 @@ package com.quickbooks.sales;
 import com.quickbooks.sales.client.MlServiceClient;
 import com.quickbooks.sales.dto.CategoryPredictionResponse;
 import com.quickbooks.sales.dto.ForecastRequest;
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-public class MlServiceClientIntegrationTest {
-    @Autowired
-    private MlServiceClient mlServiceClient;
+class MlServiceClientIntegrationTest {
 
     @Test
-    void testMlForecast() {
+    void forecast_shouldSendAuthenticatedRequestAndDeserializeResponse() throws Exception {
+        AtomicReference<String> receivedToken = new AtomicReference<>();
+        AtomicReference<String> receivedBody = new AtomicReference<>();
 
-        ForecastRequest request = new ForecastRequest(1L,
-                "Electronics",
-                List.of(
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 6, 15),
-                                new BigDecimal("9000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 6, 22),
-                                new BigDecimal("11000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 6, 29),
-                                new BigDecimal("10000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 7, 6),
-                                new BigDecimal("13000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 7, 13),
-                                new BigDecimal("12000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 7, 20),
-                                new BigDecimal("15000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 7, 27),
-                                new BigDecimal("14000")),
-                        new ForecastRequest.WeeklySales(
-                                LocalDate.of(2026, 8, 3),
-                                new BigDecimal("16000"))
-                ),
-                1
-        );
+        HttpServer mockMlService = HttpServer.create(
+                new InetSocketAddress("localhost", 0), 0);
+        mockMlService.createContext("/forecast", exchange -> {
+            receivedToken.set(exchange.getRequestHeaders()
+                    .getFirst("X-ML-Service-Token"));
+            receivedBody.set(new String(
+                    exchange.getRequestBody().readAllBytes(),
+                    StandardCharsets.UTF_8));
 
-        CategoryPredictionResponse response =
-                mlServiceClient.forecast(request);
-        assertNotNull(response);
-        assertEquals("Electronics", response.category());
-        assertNotNull(response.predictedSales());
-        assertTrue(response.predictedSales().compareTo(BigDecimal.ZERO) >= 0);
+            byte[] response = """
+                    {
+                      "category": "Electronics",
+                      "predictedSales": 12500.00,
+                      "historicalThroughDate": "2026-08-03",
+                      "weeklyPredictions": [],
+                      "historicalActuals": [],
+                      "productForecasts": []
+                    }
+                    """.getBytes(StandardCharsets.UTF_8);
 
-        System.out.println(
-                "ML response: "
-                        + response.category()
-                        + " = "
-                        + response.predictedSales()
-        );
+            exchange.getResponseHeaders().add(
+                    "Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.length);
+            try (var output = exchange.getResponseBody()) {
+                output.write(response);
+            }
+        });
+        mockMlService.start();
+
+        try {
+            String baseUrl = "http://localhost:"
+                    + mockMlService.getAddress().getPort();
+            MlServiceClient client = new MlServiceClient(baseUrl, "test-ml-token");
+
+            ForecastRequest request = new ForecastRequest(
+                    1L,
+                    "Electronics",
+                    List.of(
+                            new ForecastRequest.WeeklySales(
+                                    LocalDate.of(2026, 6, 15),
+                                    new BigDecimal("9000")),
+                            new ForecastRequest.WeeklySales(
+                                    LocalDate.of(2026, 6, 22),
+                                    new BigDecimal("11000"))
+                    ),
+                    1
+            );
+
+            CategoryPredictionResponse response = client.forecast(request);
+
+            assertNotNull(response);
+            assertEquals("Electronics", response.category());
+            assertEquals(new BigDecimal("12500.00"), response.predictedSales());
+            assertEquals("test-ml-token", receivedToken.get());
+            assertTrue(receivedBody.get().contains("\"category\":\"Electronics\""));
+        } finally {
+            mockMlService.stop(0);
+        }
     }
 }
